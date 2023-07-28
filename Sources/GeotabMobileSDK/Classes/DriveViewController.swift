@@ -86,6 +86,11 @@ open class DriveViewController: UIViewController, WKScriptMessageHandler, ViewPr
         webviewConfig.userContentController = self.contentController
         let script = WKUserScript(source: self.moduleScripts, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         self.contentController.addUserScript(script)
+        let jsListener = "GeotabJSInterface = {AddHosManual: function (json) { webkit.messageHandlers.AddHosManual.postMessage(json); }};"
+        let userScript = WKUserScript(source: jsListener, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        self.contentController.addUserScript(userScript)
+        self.contentController.add(self, name: "AddHosManual")
+
         let device = DeviceModule.device
         webviewConfig.applicationNameForUserAgent = "MobileSDK/\(MobileSdkConfig.sdkVersion) \(device.appName)/\(device.version)"
         let view = WKWebView(frame: .zero, configuration: webviewConfig)
@@ -173,6 +178,11 @@ open class DriveViewController: UIViewController, WKScriptMessageHandler, ViewPr
         guard let msg = message.body as? String else {
             return
         }
+        
+        if (message.name == "AddHosManual") {
+            print("HHHHHHOOOOOOLLLLLLAAAAA")
+        }
+        
         let module = message.name
         let data = Data(msg.utf8)
         do {
